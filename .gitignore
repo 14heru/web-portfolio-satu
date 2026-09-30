@@ -1,0 +1,19 @@
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local Environment & Database Secrets
+config.local.php
+*.env
+*.log
+*.sql.bak
+
+# Node / Vendor dependencies (jika ada)
+node_modules/
+vendor/
+
+# Temporary Uploads (keep directory structure)
+uploads/projects/*
+!uploads/projects/.gitkeep

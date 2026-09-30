@@ -1,0 +1,15 @@
+# Proteksi Direktori: Larang Eksekusi File PHP & Script Eksternal
+# Hanya izinkan file statis gambar yang aman
+
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|cgi|pl|exe)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Mencegah sniffing MIME-type berbahaya
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# Matikan directory browsing
+Options -Indexes
