@@ -3,11 +3,11 @@
 -- Standar: Normalized, UTF8mb4, InnoDB, Production-Ready
 -- ==========================================================
 
-CREATE DATABASE IF NOT EXISTS `web_portfolio_satu`
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
+-- CREATE DATABASE IF NOT EXISTS `web_portfolio_satu`
+--   CHARACTER SET utf8mb4
+--   COLLATE utf8mb4_unicode_ci;
 
-USE `web_portfolio_satu`;
+-- USE `web_portfolio_satu`;
 
 -- ----------------------------------------------------------
 -- 1. TABEL USERS (Autentikasi Administrator)

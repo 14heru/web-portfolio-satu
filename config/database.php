@@ -12,17 +12,43 @@
 
 declare(strict_types=1);
 
-// Konfigurasi Kredensial Database
-define('DB_HOST', '127.0.0.1');
-define('DB_PORT', '3306');
-define('DB_NAME', 'web_portfolio_satu');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// ============================================================================
+// Deteksi Otomatis Environment (Dual-Environment: Lokal XAMPP vs InfinityFree)
+// ============================================================================
+$httpHost = strtolower($_SERVER['HTTP_HOST'] ?? 'localhost');
+// Hilangkan port jika ada pada host (misal localhost:8080)
+$hostWithoutPort = explode(':', $httpHost)[0];
+
+// Cek apakah request berasal dari lingkungan lokal atau production
+$isLocal = in_array($hostWithoutPort, ['localhost', '127.0.0.1', '::1'], true)
+    || str_ends_with($hostWithoutPort, '.local')
+    || str_ends_with($hostWithoutPort, '.test');
+
+if ($isLocal) {
+    // 1. Environment Lokal (XAMPP / Localhost)
+    // Sesuaikan DB_NAME jika menggunakan 'db_portofolio' atau 'web_portfolio_satu'
+    define('DB_HOST', 'localhost');
+    define('DB_PORT', '3306');
+    define('DB_NAME', 'web_portfolio_satu'); // Ganti jika database lokal bernama 'web_portfolio_satu'
+    define('DB_USER', 'root');
+    define('DB_PASS', '');
+    define('APP_ENV', 'development');
+} else {
+    // 2. Environment Hosting / Production (Server Live)
+    // Sediakan dan sesuaikan kredensial hosting Anda di sini sebelum / setelah upload FileZilla:
+    define('DB_HOST', 'sql204.infinityfree.com'); // Contoh host MySQL hosting: sqlXXX.infinityfree.com / localhost
+    define('DB_PORT', '3306');
+    define('DB_NAME', 'if0_42880742_web_portfolio_satu'); // Ganti dengan nama database cPanel/Hosting Anda
+    define('DB_USER', 'if0_42880742');                    // Ganti dengan username database Hosting Anda
+    define('DB_PASS', 'en8jhi62uMTu');                    // Ganti dengan password database Hosting Anda
+    define('APP_ENV', 'production');
+}
+
 define('DB_CHARSET', 'utf8mb4');
 
 /**
  * Mendapatkan koneksi tunggal PDO
- * 
+ *
  * @return PDO
  * @throws PDOException jika terjadi kegagalan koneksi
  */
@@ -95,8 +121,8 @@ function getDB(): PDO
             </head>
             <body>
                 <div class="box">
-                    <h1>Koneksi Basis Data Terputus</h1>
-                    <p>Layanan belum dapat terhubung ke basis data <code>web_portfolio_satu</code>. Pastikan modul MySQL di XAMPP telah berjalan dan skema <code>schema.sql</code> telah di-import.</p>
+                    <h1>Layanan Sedang Dalam Pemeliharaan</h1>
+                    <p>Sistem sementara tidak dapat terhubung ke basis data. Silakan muat ulang beberapa saat lagi.</p>
                 </div>
             </body>
             </html>

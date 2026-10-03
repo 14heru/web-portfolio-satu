@@ -18,10 +18,15 @@ if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.use_only_cookies', '1');
     ini_set('session.use_strict_mode', '1');
 
+    // Deteksi protokol HTTPS secara dinamis
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+
     session_start([
-        'cookie_httponly' => true, // Mencegah pencurian cookie via JavaScript (XSS)
-        'cookie_samesite' => 'Lax',  // Proteksi CSRF level browser
-        'cookie_secure'   => false, // Ubah ke true jika sudah menggunakan HTTPS/SSL
+        'cookie_httponly' => true,      // Mencegah pencurian cookie via JavaScript (XSS)
+        'cookie_samesite' => 'Lax',       // Proteksi CSRF level browser
+        'cookie_secure'   => $isHttps,  // Otomatis aktif saat koneksi menggunakan HTTPS
     ]);
 }
 
@@ -238,3 +243,53 @@ function handle_project_image_upload(array $fileInput, string $targetDir): array
 
     return ['success' => true, 'filename' => $newFileName, 'error' => null];
 }
+
+/**
+ * Mendapatkan Base URL proyek secara otomatis dan dinamis
+ * Bekerja mulus di localhost (dengan subfolder misal /web-portfolio-satu)
+ * maupun di hosting InfinityFree (root domain/subdomain).
+ *
+ * @param string $path Path relatif yang ingin disambung (opsional)
+ * @return string Full URL atau root-relative URL yang aman
+ */
+function base_url(string $path = ''): string
+{
+    static $baseUrl = null;
+
+    if ($baseUrl === null) {
+        // Deteksi HTTPS
+        $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+            || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+        $protocol = $isHttps ? 'https://' : 'http://';
+
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+        // Hitung direktori dasar proyek relatif terhadap DOCUMENT_ROOT
+        $docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: '');
+        $projectRoot = str_replace('\\', '/', realpath(__DIR__ . '/..') ?: '');
+
+        $subDir = '';
+        if ($docRoot !== '' && str_starts_with($projectRoot, $docRoot)) {
+            $subDir = substr($projectRoot, strlen($docRoot));
+        }
+
+        $subDir = trim($subDir, '/');
+        $baseUrl = $protocol . $host . ($subDir !== '' ? '/' . $subDir : '');
+    }
+
+    $path = ltrim($path, '/');
+    return $path !== '' ? $baseUrl . '/' . $path : $baseUrl;
+}
+
+/**
+ * Helper untuk asset URL (CSS, JS, Images, Uploads)
+ *
+ * @param string $path Path relatif aset dari root proyek
+ * @return string Full URL aset
+ */
+function asset_url(string $path = ''): string
+{
+    return base_url($path);
+}
+

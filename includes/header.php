@@ -29,14 +29,14 @@ if (!isset($pageDesc)) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Pure Native Stylesheet (Anti-AI Slop) -->
-    <link rel="stylesheet" href="public/css/style.css">
+    <link rel="stylesheet" href="<?= e(asset_url('public/css/style.css')); ?>">
 </head>
 <body>
 
     <!-- Header & Navigasi Zen Responsif -->
     <header class="site-header">
         <div class="container site-nav">
-            <a href="index.php" class="brand-link" aria-label="Beranda">
+            <a href="<?= e(base_url('index.php')); ?>" class="brand-link" aria-label="Beranda">
                 <span class="brand-dot"></span>
                 <span>Heru Perdana Saputra</span>
             </a>
@@ -53,11 +53,11 @@ if (!isset($pageDesc)) {
             <div class="nav-menu-wrapper" id="nav-menu">
                 <nav>
                     <ul class="nav-links">
-                        <li><a href="index.php#hero" class="nav-link">Beranda</a></li>
-                        <li><a href="index.php#projects" class="nav-link">Karya</a></li>
-                        <li><a href="index.php#skills" class="nav-link">Keahlian</a></li>
-                        <li><a href="index.php#about" class="nav-link">Tentang</a></li>
-                        <li><a href="index.php#contact" class="nav-link">Kontak</a></li>
+                        <li><a href="<?= e(base_url('index.php#hero')); ?>" class="nav-link">Beranda</a></li>
+                        <li><a href="<?= e(base_url('index.php#projects')); ?>" class="nav-link">Karya</a></li>
+                        <li><a href="<?= e(base_url('index.php#skills')); ?>" class="nav-link">Keahlian</a></li>
+                        <li><a href="<?= e(base_url('index.php#about')); ?>" class="nav-link">Tentang</a></li>
+                        <li><a href="<?= e(base_url('index.php#contact')); ?>" class="nav-link">Kontak</a></li>
                     </ul>
                 </nav>
             </div>
