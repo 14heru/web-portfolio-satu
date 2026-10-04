@@ -61,7 +61,8 @@ function initPillNav() {
     });
 
     // The final section remains active when the page reaches its bottom.
-    if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+    const scrollRoot = document.scrollingElement || document.documentElement;
+    if (scrollRoot.scrollTop + scrollRoot.clientHeight >= scrollRoot.scrollHeight - 2) {
       activeIndex = sections.length - 1;
     }
 

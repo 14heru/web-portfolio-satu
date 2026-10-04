@@ -25,6 +25,6 @@ declare(strict_types=1);
     </footer>
 
     <!-- Interactive Vanilla JS (Filter & UI) -->
-    <script src="public/js/main.js"></script>
+    <script src="<?= e(asset_url('public/js/main.js') . '?v=' . (string) filemtime(__DIR__ . '/../public/js/main.js')); ?>"></script>
 </body>
 </html>
