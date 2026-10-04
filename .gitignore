@@ -17,3 +17,5 @@ vendor/
 # Temporary Uploads (keep directory structure)
 uploads/projects/*
 !uploads/projects/.gitkeep
+
+config/database.php
