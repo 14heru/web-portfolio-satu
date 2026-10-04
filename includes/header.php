@@ -12,6 +12,7 @@ if (!isset($pageTitle)) {
 if (!isset($pageDesc)) {
     $pageDesc = 'Portofolio rekayasa web bersih, performa tinggi, dan berestetika tenang.';
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -29,39 +30,15 @@ if (!isset($pageDesc)) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Pure Native Stylesheet (Anti-AI Slop) -->
-    <link rel="stylesheet" href="<?= e(asset_url('public/css/style.css')); ?>">
+    <link rel="stylesheet" href="<?= e(asset_url('public/css/style.css') . '?v=' . (string) filemtime(__DIR__ . '/../public/css/style.css')); ?>">
 </head>
 <body>
-
-    <!-- Header & Navigasi Zen Responsif -->
-    <header class="site-header">
-        <div class="container site-nav">
-            <a href="<?= e(base_url('index.php')); ?>" class="brand-link" aria-label="Beranda">
-                <span class="brand-dot"></span>
-                <span>Heru Perdana Saputra</span>
-            </a>
-
-            <!-- Tombol Toggle Menu Mobile (Hamburger) -->
-            <button type="button" class="nav-toggle-btn" id="nav-toggle" aria-label="Buka Menu Navigasi" aria-expanded="false">
-                <span class="nav-toggle-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-            </button>
-
-            <div class="nav-menu-wrapper" id="nav-menu">
-                <nav>
-                    <ul class="nav-links">
-                        <li><a href="<?= e(base_url('index.php#hero')); ?>" class="nav-link">Beranda</a></li>
-                        <li><a href="<?= e(base_url('index.php#projects')); ?>" class="nav-link">Karya</a></li>
-                        <li><a href="<?= e(base_url('index.php#skills')); ?>" class="nav-link">Keahlian</a></li>
-                        <li><a href="<?= e(base_url('index.php#about')); ?>" class="nav-link">Tentang</a></li>
-                        <li><a href="<?= e(base_url('index.php#contact')); ?>" class="nav-link">Kontak</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <main id="main-content">
+    <div class="floating-nav-wrapper">
+        <nav class="pill-nav" aria-label="Navigasi utama">
+            <a class="pill-nav-item active" href="<?= e(base_url('index.php#hero')); ?>" aria-current="page">Beranda</a>
+            <a class="pill-nav-item" href="<?= e(base_url('index.php#projects')); ?>">Project</a>
+            <a class="pill-nav-item" href="<?= e(base_url('index.php#skills')); ?>">Keahlian</a>
+            <a class="pill-nav-item" href="<?= e(base_url('index.php#about')); ?>">Tentang</a>
+            <a class="pill-nav-item" href="<?= e(base_url('index.php#contact')); ?>">Kontak</a>
+        </nav>
+    </div>

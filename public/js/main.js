@@ -3,67 +3,113 @@
  * Interactive Vanilla JS (public/js/main.js)
  * ============================================================================
  * - Client-side dynamic filtering for project cards
- * - Accessible mobile navigation toggle (Hamburger menu)
- * - Auto-close mobile menu on link click or outside click
  * - Smooth state transitions
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  initMobileNav();
   initProjectFilter();
+  initPillNav();
 });
 
-/**
- * Mobile Navigation Toggle (Hamburger Menu)
- */
-function initMobileNav() {
-  const toggleBtn = document.getElementById("nav-toggle");
-  const navMenu = document.getElementById("nav-menu");
+function initPillNav() {
+  const navItems = Array.from(document.querySelectorAll(".pill-nav-item"));
 
-  if (!toggleBtn || !navMenu) {
+  if (!navItems.length) {
     return;
   }
 
-  // Toggle menu saat tombol hamburger diklik
-  toggleBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const isOpen = navMenu.classList.toggle("is-open");
-    toggleBtn.classList.toggle("is-active", isOpen);
-    toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  const sections = navItems
+    .map((item) => {
+      const hash = new URL(item.href, window.location.href).hash;
+      return hash ? document.getElementById(hash.slice(1)) : null;
+    })
+    .filter(Boolean);
+
+  let pendingItem = null;
+  let scrollEndTimer = null;
+  let scrollFrame = null;
+
+  const setActiveItem = (activeItem) => {
+    navItems.forEach((item) => {
+      const isActive = item === activeItem;
+      item.classList.toggle("active", isActive);
+
+      if (isActive) {
+        item.setAttribute("aria-current", "location");
+      } else {
+        item.removeAttribute("aria-current");
+      }
+    });
+  };
+
+  const itemFromHash = () => navItems.find((item) => {
+    const target = new URL(item.href, window.location.href);
+    return target.hash && target.hash === window.location.hash;
   });
 
-  // Tutup menu secara otomatis saat salah satu link navigasi diklik
-  const navLinks = navMenu.querySelectorAll("a");
-  navLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      if (navMenu.classList.contains("is-open")) {
-        navMenu.classList.remove("is-open");
-        toggleBtn.classList.remove("is-active");
-        toggleBtn.setAttribute("aria-expanded", "false");
+  const updateFromScroll = () => {
+    if (!sections.length) return;
+
+    // The latest section whose top passed this line is the active section.
+    const activationLine = Math.min(window.innerHeight * 0.35, 180);
+    let activeIndex = 0;
+
+    sections.forEach((section, index) => {
+      if (section.getBoundingClientRect().top <= activationLine) {
+        activeIndex = index;
       }
+    });
+
+    // The final section remains active when the page reaches its bottom.
+    if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+      activeIndex = sections.length - 1;
+    }
+
+    setActiveItem(navItems.find((item) => {
+      const hash = new URL(item.href, window.location.href).hash;
+      return hash === `#${sections[activeIndex].id}`;
+    }));
+  };
+
+  const scheduleScrollUpdate = () => {
+    if (scrollFrame === null) {
+      scrollFrame = window.requestAnimationFrame(() => {
+        scrollFrame = null;
+        if (!pendingItem) updateFromScroll();
+      });
+    }
+
+    if (pendingItem) {
+      window.clearTimeout(scrollEndTimer);
+      scrollEndTimer = window.setTimeout(() => {
+        pendingItem = null;
+        updateFromScroll();
+      }, 160);
+    }
+  };
+
+  navItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      pendingItem = item;
+      setActiveItem(item);
+      window.clearTimeout(scrollEndTimer);
+      scrollEndTimer = window.setTimeout(() => {
+        pendingItem = null;
+        updateFromScroll();
+      }, 160);
     });
   });
 
-  // Tutup menu jika user mengklik di luar area navigasi
-  document.addEventListener("click", (e) => {
-    if (!navMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
-      if (navMenu.classList.contains("is-open")) {
-        navMenu.classList.remove("is-open");
-        toggleBtn.classList.remove("is-active");
-        toggleBtn.setAttribute("aria-expanded", "false");
-      }
-    }
+  window.addEventListener("scroll", scheduleScrollUpdate, { passive: true });
+  window.addEventListener("hashchange", () => {
+    const hashItem = itemFromHash();
+    if (hashItem) setActiveItem(hashItem);
+    scheduleScrollUpdate();
   });
 
-  // Tutup menu jika tombol ESC ditekan
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && navMenu.classList.contains("is-open")) {
-      navMenu.classList.remove("is-open");
-      toggleBtn.classList.remove("is-active");
-      toggleBtn.setAttribute("aria-expanded", "false");
-      toggleBtn.focus();
-    }
-  });
+  const initialItem = itemFromHash();
+  if (initialItem) setActiveItem(initialItem);
+  else updateFromScroll();
 }
 
 /**

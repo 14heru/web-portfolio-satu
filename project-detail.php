@@ -45,6 +45,7 @@ if ($project) {
 require_once __DIR__ . '/includes/header.php';
 ?>
 
+<main id="main-content">
 <div class="container project-detail-layout">
 
     <?php if ($project): ?>

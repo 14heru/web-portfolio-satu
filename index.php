@@ -111,14 +111,15 @@ try {
     ');
     $allSkills = $skillsStmt->fetchAll();
 
-    // Kelompokkan skill berdasarkan kategori
-    $skillsByCategory = [];
-    foreach ($allSkills as $skill) {
-        $skillsByCategory[$skill['category']][] = $skill;
-    }
 } catch (PDOException $e) {
     error_log('[FETCH SKILLS ERROR] ' . $e->getMessage());
-    $skillsByCategory = [];
+    $allSkills = [];
+}
+
+// Bagi skill bergantian agar kedua jalur marquee memiliki isi yang seimbang.
+$skillRows = [[], []];
+foreach ($allSkills as $index => $skill) {
+    $skillRows[$index % 2][] = $skill;
 }
 
 // Ambil notifikasi pesan flash jika ada
@@ -132,6 +133,7 @@ $pageDesc = 'Portofolio resmi Heru Perdana Saputra.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 
+<main id="main-content">
 <!-- Hero Section -->
 <section id="hero" class="hero-section">
     <div class="container">
@@ -265,32 +267,31 @@ require_once __DIR__ . '/includes/header.php';
 
 <hr class="section-divider">
 
-<!-- Section Skills / Focus (No Fake Progress Bars) -->
+<!-- Section Skills / Infinite Marquee -->
 <section id="skills" class="section">
     <div class="container">
         <div class="section-header">
             <span class="section-tag">Fokus &amp; Kapabilitas</span>
-            <h2 class="section-title">Keahlian Rekayasa Software</h2>
+            <h2 class="section-title">Keahlian Teknis</h2>
             <p class="section-desc">
-                Teknologi yang saya gunakan secara mendalam tanpa persentase kemampuan buatan.
+                Teknologi dan perangkat kerja yang saya gunakan dalam pengembangan software.
             </p>
         </div>
 
-        <div class="skills-container">
-            <?php if (!empty($skillsByCategory)): ?>
-                <?php foreach ($skillsByCategory as $categoryName => $skills): ?>
-                    <div class="skill-category-card">
-                        <h3 class="skill-category-title">
-                            <?= e($categoryName); ?>
-                        </h3>
-                        <div class="skill-items">
-                            <?php foreach ($skills as $skill): ?>
-                                <div class="skill-item">
-                                    <div class="skill-name"><?= e($skill['name']); ?></div>
-                                    <?php if (!empty($skill['description'])): ?>
-                                        <div class="skill-desc"><?= e($skill['description']); ?></div>
-                                    <?php endif; ?>
-                                </div>
+        <div class="skills-marquees">
+            <?php if (!empty($allSkills)): ?>
+                <?php foreach ($skillRows as $rowIndex => $rowSkills): ?>
+                    <?php if (empty($rowSkills)) { continue; } ?>
+                    <?php $loopSkills = array_merge($rowSkills, $rowSkills); ?>
+                    <div class="skills-marquee<?= $rowIndex === 1 ? ' skills-marquee--reverse' : ''; ?>" aria-label="Daftar keahlian teknis, baris <?= $rowIndex + 1; ?>">
+                        <div class="skills-marquee-track">
+                            <?php foreach ($loopSkills as $copyIndex => $skill): ?>
+                                <span class="skill-pill"<?= $copyIndex >= count($rowSkills) ? ' aria-hidden="true"' : ''; ?>>
+                                    <svg class="skill-pill-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                        <path d="m8 7-5 5 5 5M16 7l5 5-5 5m-3-13-2 14" />
+                                    </svg>
+                                    <span><?= e($skill['name']); ?></span>
+                                </span>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -373,7 +374,7 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="contact-methods">
                     <div class="contact-method-item">
                         <span class="contact-method-label">Lokasi</span>
-                        <span class="contact-method-value">Padang, Indonesia (UTC+7 / WIB)</span>
+                        <span class="contact-method-value">Indonesia (UTC+7 / WIB)</span>
                     </div>
                     <div class="contact-method-item">
                         <span class="contact-method-label">Email Langsung</span>
